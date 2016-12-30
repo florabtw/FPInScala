@@ -89,3 +89,4 @@ object TestLeest extends App {
 
   println(Leest.concat(List(List(4,5), List(1,2), List(8,9)))) // List(4,5,1,2,8,9)
 }
+
