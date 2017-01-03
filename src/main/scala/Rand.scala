@@ -28,7 +28,7 @@ object Rand {
       if (fs.isEmpty) (res, rng)
       else {
         val (a, rng2) = fs.head(rng)
-        go(rng, fs.tail, a :: res)
+        go(rng2, fs.tail, a :: res)
       }
     }
 
