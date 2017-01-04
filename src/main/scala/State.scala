@@ -8,7 +8,7 @@ case class State[S, +A](run: S => (A, S)) {
 
   def map2[B,C](sb: State[S, B])(f: (A, B) => C): State[S, C] = State(s => {
     val (a, s2) = run(s)
-    val (b, s3) = run(s2)
+    val (b, s3) = sb.run(s2)
 
     (f(a, b), s3)
   })
@@ -47,4 +47,22 @@ object State {
 
 object StatePrint extends App {
   println(State.unit(5).run("okay"))
+}
+
+sealed trait Input
+case object Coin extends Input
+case object Turn extends Input
+
+case class Machine(locked: Boolean, candies: Int, coins: Int)
+
+object Machine {
+  @tailrec
+  private def go(inputs: List[Input], machine: Machine): ((Int, Int), Machine) = inputs match {
+    case Coin :: tail if machine.candies > 0 && machine.locked => go(tail, Machine(false, machine.candies, machine.coins + 1))
+    case Turn :: tail if !machine.locked => go(tail, Machine(true, machine.candies - 1, machine.coins))
+    case _ :: tail => go(tail, machine)
+    case Nil => ((machine.candies, machine.coins), machine)
+  }
+
+  def simulateMachine(inputs: List[Input]): State[Machine, (Int, Int)] = State[Machine, (Int, Int)](m => go(inputs, m))
 }
